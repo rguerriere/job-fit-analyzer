@@ -1,0 +1,23 @@
+Jordan Rivera (fictional person for testing)
+jordan.rivera@example.com | (555) 010-2299 | Austin, TX
+
+EXPERIENCE
+IT Support Technician, Lakeside Community College — Austin, TX | Aug 2023 – Present
+- Resolve 40+ help-desk tickets per week for staff and students
+- Wrote a PowerShell script that automated new-laptop setup, cutting setup time from 2 hours to 25 minutes
+- Helped migrate 300 faculty accounts to Microsoft 365
+
+Shift Lead, Bean There Coffee — Austin, TX | Jun 2021 – Jul 2023
+- Trained 6 new baristas
+- Built a Google Sheets inventory tracker that reduced weekly waste by about 15%
+
+PROJECTS
+Pantry Pal (personal project) — React, TypeScript, Firebase
+- Web app that suggests recipes from ingredients you have; 120 monthly users among friends and classmates
+
+EDUCATION
+A.S. Computer Science, Lakeside Community College — expected May 2026
+
+SKILLS
+Languages: JavaScript, TypeScript, Python, PowerShell
+Tools: Git, React, Firebase, Microsoft 365 admin, Google Sheets

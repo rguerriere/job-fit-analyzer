@@ -1,6 +1,6 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { createModel } from "./llm.js";
-import { JobPostingSchema, type JobPosting } from "./schemas/jobPosting.js";
+import { createModel } from "./llm";
+import { JobPostingSchema, type JobPosting } from "./schemas/jobPosting";
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
@@ -19,10 +19,10 @@ statements and generic company marketing.`,
 ]);
 
 /** Turns raw job-posting text into a validated JobPosting object. */
-export async function extractJobPosting(postingText: string): Promise<JobPosting> {
+export async function extractJobPosting(apiKey: string, postingText: string): Promise<JobPosting> {
   // "jsonSchema" uses Claude's native structured outputs. The default
   // ("functionCalling") relies on forced tool use, which current Claude models reject.
-  const structuredModel = createModel().withStructuredOutput(JobPostingSchema, {
+  const structuredModel = createModel(apiKey).withStructuredOutput(JobPostingSchema, {
     name: "job_posting",
     method: "jsonSchema",
   });

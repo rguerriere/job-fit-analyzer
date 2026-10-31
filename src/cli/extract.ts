@@ -4,7 +4,8 @@
  *   Get-Content posting.txt | npm run extract     (PowerShell)
  */
 import { readFile } from "node:fs/promises";
-import { extractJobPosting } from "../extractor.js";
+import { getEnvApiKey } from "../lib/config";
+import { extractJobPosting } from "../lib/extractor";
 
 async function readInput(): Promise<string> {
   const filePath = process.argv[2];
@@ -23,7 +24,7 @@ async function main() {
   if (!text) throw new Error("The job posting is empty.");
 
   console.error("Extracting job posting...");
-  const job = await extractJobPosting(text);
+  const job = await extractJobPosting(getEnvApiKey(), text);
   console.log(JSON.stringify(job, null, 2));
 }
 

@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium text-stone-600 dark:text-stone-400;
+  }
+  .input {
+    @apply w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900
+      placeholder:text-stone-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/30 focus:outline-none
+      dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-3.5 py-2
+      text-sm font-medium text-stone-800 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50
+      dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800;
+  }
+  .btn-primary {
+    @apply border-teal-700 bg-teal-700 text-white hover:bg-teal-800 dark:border-teal-600 dark:bg-teal-600
+      dark:hover:bg-teal-500;
+  }
+  .btn-danger {
+    @apply text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950;
+  }
+  .alert-error {
+    @apply rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900
+      dark:bg-red-950 dark:text-red-200;
+  }
+  .chip {
+    @apply rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-700 dark:bg-stone-800 dark:text-stone-300;
+  }
+}

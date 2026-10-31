@@ -1,0 +1,29 @@
+Junior Full-Stack Developer
+Brightleaf Analytics (fictional company for testing) - Austin, TX (Hybrid, 3 days in office)
+
+About us
+Brightleaf builds dashboards that help small farms track soil health and crop yields. We're a team of 25 that loves clean code and happy customers!
+
+What you'll do
+- Build and maintain features in our React + TypeScript web app
+- Write REST endpoints in Node.js (Express) backed by PostgreSQL
+- Collaborate with designers to turn Figma mockups into responsive UI
+- Write unit and integration tests and participate in code reviews
+- Help troubleshoot customer-reported bugs
+
+What we're looking for
+- 1+ years of professional or substantial project experience with JavaScript/TypeScript
+- Experience with React
+- Familiarity with SQL databases
+- Comfortable with Git and GitHub pull-request workflows
+- Clear written communication
+
+Nice to have
+- Experience with charting libraries (D3, Recharts)
+- Exposure to AWS or another cloud provider
+- Interest in agriculture or climate tech
+
+Compensation: $70,000 - $85,000 per year plus equity and health benefits.
+Full-time. Apply by December 15, 2026.
+
+Brightleaf Analytics is an equal opportunity employer.

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { NavLink } from "@/components/NavLink";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,22 +10,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    // Browser extensions like Dark Reader add attributes to <html> before React loads.
+    // This only silences mismatched attributes on this one tag, not on the rest of the page.
+    <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen">
         <header className="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
           <nav className="mx-auto flex h-14 max-w-4xl items-center gap-6 px-4 text-sm">
             <Link href="/" className="font-semibold text-teal-800 dark:text-teal-400">
               Job Fit Analyzer
             </Link>
-            <Link href="/bank" className="text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white">
-              Career bank
-            </Link>
-            <Link
-              href="/settings"
-              className="ml-auto text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white"
-            >
+            <NavLink href="/opportunities">Opportunities</NavLink>
+            <NavLink href="/analyze">Analyze a job</NavLink>
+            <NavLink href="/bank">Career bank</NavLink>
+            <NavLink href="/settings" className="ml-auto">
               Settings
-            </Link>
+            </NavLink>
           </nav>
         </header>
         <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>

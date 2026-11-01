@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { ENTRY_KINDS } from "../lib/schemas/bankEntry";
+import type { RequirementResult } from "../lib/schemas/fitAnalysis";
 
 const timestamps = {
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -43,5 +44,31 @@ export const bankEntries = sqliteTable(
   (t) => [index("bank_entries_user_idx").on(t.userId)],
 );
 
+/** A job posting the user analyzed, with Claude's verdicts. Shown on the Opportunities page. */
+export const analyses = sqliteTable(
+  "analyses",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    jobTitle: text("job_title").notNull(),
+    company: text("company"),
+    postingText: text("posting_text").notNull(),
+    score: integer("score"),
+    // Score before the most recent re-analysis, to show how it changed.
+    previousScore: integer("previous_score"),
+    requirements: text("requirements", { mode: "json" }).$type<RequirementResult[]>().notNull(),
+    // Entry titles as they were when analyzed, so results still read right if the bank changes.
+    entryTitles: text("entry_titles", { mode: "json" }).$type<Record<string, string>>().notNull(),
+    analyzedAt: integer("analyzed_at", { mode: "timestamp" }).notNull(),
+    ...timestamps,
+  },
+  (t) => [index("analyses_user_idx").on(t.userId)],
+);
+
 export type User = typeof users.$inferSelect;
 export type BankEntry = typeof bankEntries.$inferSelect;
+export type Analysis = typeof analyses.$inferSelect;

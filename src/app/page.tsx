@@ -1,80 +1,79 @@
 import { count, eq } from "drizzle-orm";
 import Link from "next/link";
 import { db } from "@/db/client";
-import { bankEntries } from "@/db/schema";
+import { analyses, bankEntries } from "@/db/schema";
 import { getCurrentUser } from "@/lib/currentUser";
 
 export const dynamic = "force-dynamic";
 
+const STEPS = [
+  {
+    title: "Build your career bank",
+    detail: "Upload your resume or paste notes. Claude organizes them into entries you can review and edit.",
+    href: "/bank",
+  },
+  {
+    title: "Analyze a job",
+    detail: "Paste a posting to get a fit score out of 100 and the requirements you don't cover yet.",
+    href: "/analyze",
+  },
+  {
+    title: "Track opportunities",
+    detail: "Every analysis is saved. Re-analyze any of them after you update your career bank.",
+    href: "/opportunities",
+  },
+];
+
 export default async function HomePage() {
   const user = await getCurrentUser();
-  const [row] = await db
-    .select({ total: count() })
-    .from(bankEntries)
-    .where(eq(bankEntries.userId, user.id));
-  const entryCount = row?.total ?? 0;
+  const [[bank], [saved]] = await Promise.all([
+    db.select({ total: count() }).from(bankEntries).where(eq(bankEntries.userId, user.id)),
+    db.select({ total: count() }).from(analyses).where(eq(analyses.userId, user.id)),
+  ]);
 
-  const steps = [
-    {
-      title: "Add your Anthropic API key",
-      detail: "The app uses your own key, so AI usage is billed to your Anthropic account.",
-      done: Boolean(user.anthropicApiKey),
-      href: "/settings",
-      action: user.anthropicApiKey ? "Change key" : "Add key",
-    },
-    {
-      title: "Build your career bank",
-      detail:
-        entryCount > 0
-          ? `${entryCount} ${entryCount === 1 ? "entry" : "entries"} saved.`
-          : "Upload your resume or paste notes about your experience.",
-      done: entryCount > 0,
-      href: "/bank",
-      action: entryCount > 0 ? "View bank" : "Start",
-    },
-    {
-      title: "Analyze a job posting",
-      detail: "Get a fit score, matched requirements with evidence, and gaps. Coming in the next stage.",
-      done: false,
-      href: null,
-      action: null,
-    },
-  ];
+  // Point the main button at whatever the user should do next.
+  const next = !user.anthropicApiKey
+    ? { href: "/settings", label: "Add your API key to start" }
+    : !bank?.total
+      ? { href: "/bank/import", label: "Build your career bank" }
+      : { href: "/analyze", label: "Analyze a job" };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">See how well you fit a job before you apply</h1>
-        <p className="mt-2 max-w-2xl text-stone-600 dark:text-stone-400">
+    <div className="space-y-10 py-6">
+      <div className="max-w-2xl">
+        <h1 className="text-3xl font-semibold tracking-tight">See how well you fit a job before you apply</h1>
+        <p className="mt-3 text-stone-600 dark:text-stone-400">
           Keep your experience in one place, then compare it against any job posting. Every match is backed by
           something you actually did, never invented.
         </p>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Link href={next.href} className="btn btn-primary">
+            {next.label}
+          </Link>
+          {saved?.total ? (
+            <Link href="/opportunities" className="btn">
+              View {saved.total} {saved.total === 1 ? "opportunity" : "opportunities"}
+            </Link>
+          ) : null}
+        </div>
       </div>
 
-      <ol className="space-y-3">
-        {steps.map((step, i) => (
-          <li key={step.title} className="card flex items-center gap-4">
-            <span
-              className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
-                step.done
-                  ? "bg-teal-700 text-white dark:bg-teal-600"
-                  : "bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300"
-              }`}
-            >
-              {step.done ? "✓" : i + 1}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="font-medium">{step.title}</p>
-              <p className="text-sm text-stone-600 dark:text-stone-400">{step.detail}</p>
-            </div>
-            {step.href && (
-              <Link href={step.href} className={`btn ${step.done ? "" : "btn-primary"}`}>
-                {step.action}
+      <div>
+        <h2 className="text-sm font-semibold tracking-wide text-stone-500 uppercase dark:text-stone-400">
+          How it works
+        </h2>
+        <ol className="mt-3 grid gap-3 sm:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <li key={step.href}>
+              <Link href={step.href} className="card block h-full hover:border-teal-600 dark:hover:border-teal-500">
+                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">{i + 1}</span>
+                <p className="mt-1 font-medium">{step.title}</p>
+                <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{step.detail}</p>
               </Link>
-            )}
-          </li>
-        ))}
-      </ol>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
   );
 }

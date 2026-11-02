@@ -1,0 +1,1 @@
+ALTER TABLE `analyses` ADD `stale_dismissed_at` integer;

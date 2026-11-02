@@ -22,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <NavLink href="/opportunities">Opportunities</NavLink>
             <NavLink href="/analyze">Analyze a job</NavLink>
             <NavLink href="/bank">Career bank</NavLink>
+            <NavLink href="/interview-prep">Interview Prep</NavLink>
             <NavLink href="/settings" className="ml-auto">
               Settings
             </NavLink>

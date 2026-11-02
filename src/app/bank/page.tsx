@@ -1,18 +1,13 @@
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { db } from "@/db/client";
-import { bankEntries, type BankEntry } from "@/db/schema";
+import { bankEntries } from "@/db/schema";
+import { byRecency } from "@/lib/bankOrder";
 import { getCurrentUser } from "@/lib/currentUser";
 import { ENTRY_KINDS, KIND_LABELS } from "@/lib/schemas/bankEntry";
 import { EntryCard } from "./EntryCard";
 
 export const dynamic = "force-dynamic";
-
-/** Most recent first; ongoing ("present") entries at the top. */
-function recency(entry: BankEntry): string {
-  if (entry.endDate?.toLowerCase() === "present") return "9999";
-  return entry.endDate ?? entry.startDate ?? "";
-}
 
 export default async function BankPage() {
   const user = await getCurrentUser();
@@ -20,7 +15,7 @@ export default async function BankPage() {
 
   const groups = ENTRY_KINDS.map((kind) => ({
     kind,
-    entries: entries.filter((e) => e.kind === kind).sort((a, b) => recency(b).localeCompare(recency(a))),
+    entries: entries.filter((e) => e.kind === kind).sort(byRecency),
   })).filter((group) => group.entries.length > 0);
 
   return (

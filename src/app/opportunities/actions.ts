@@ -35,3 +35,22 @@ export async function deleteOpportunity(id: string): Promise<ActionResult> {
   revalidatePath("/opportunities");
   return { ok: true };
 }
+
+/** Hides the "career bank has changed" banner on one opportunity, until the career bank changes again. */
+export async function dismissStale(id: string): Promise<ActionResult> {
+  const user = await getCurrentUser();
+  await db
+    .update(analyses)
+    .set({ staleDismissedAt: new Date() })
+    .where(and(eq(analyses.id, id), eq(analyses.userId, user.id)));
+  revalidatePath("/opportunities");
+  return { ok: true };
+}
+
+/** Hides the "career bank has changed" banner on every opportunity. */
+export async function dismissAllStale(): Promise<ActionResult> {
+  const user = await getCurrentUser();
+  await db.update(analyses).set({ staleDismissedAt: new Date() }).where(eq(analyses.userId, user.id));
+  revalidatePath("/opportunities");
+  return { ok: true };
+}

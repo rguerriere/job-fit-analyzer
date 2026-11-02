@@ -6,6 +6,7 @@ import { db } from "@/db/client";
 import { analyses, bankEntries } from "@/db/schema";
 import { getCurrentUser } from "@/lib/currentUser";
 import { OpportunityActions } from "./OpportunityActions";
+import { StaleBanner } from "./StaleBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,12 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
     .from(bankEntries)
     .where(eq(bankEntries.userId, user.id));
   const bankChangedAt = bank?.changedAt ?? null;
+  // Stale: the career bank changed after this was analyzed, and after the banner was last dismissed.
+  const isStale = (item: (typeof items)[number]) =>
+    bankChangedAt !== null &&
+    bankChangedAt > item.analyzedAt &&
+    (item.staleDismissedAt === null || bankChangedAt > item.staleDismissedAt);
+  const staleCount = items.filter(isStale).length;
 
   return (
     <div className="space-y-6">
@@ -51,7 +58,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
         <ul className="space-y-3">
           {items.map((item) => {
             const label = item.score === null ? null : scoreLabel(item.score);
-            const stale = bankChangedAt !== null && bankChangedAt > item.analyzedAt;
+            const stale = isStale(item);
             return (
               <li key={item.id}>
                 <details open={item.id === open} className="card group">
@@ -79,11 +86,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
                   </summary>
 
                   <div className="mt-4 space-y-4 border-t border-outline pt-4">
-                    {stale && (
-                      <p className="alert-warn">
-                        Your career bank has changed since this was analyzed. Re-analyze to update the score.
-                      </p>
-                    )}
+                    {stale && <StaleBanner id={item.id} staleCount={staleCount} />}
                     {item.details && <PostingFacts details={item.details} />}
                     <FitDetails requirements={item.requirements} entryTitles={item.entryTitles} />
                     <details>

@@ -29,6 +29,10 @@
   --color-on-warn-container: #ffe08a;
   --color-success-container: #00433b;
   --color-on-success-container: #8ff0de;
+  --color-orange-container: #5c2b00;
+  --color-on-orange-container: #ffc999;
+  --color-green-container: #143d1d;
+  --color-on-green-container: #a6f0b4;
 }
 
 @layer base {
@@ -78,6 +82,22 @@
   /* Required / Preferred: a lighter gray so it stands out from the card. */
   .chip-importance {
     @apply bg-surface-highest text-fg;
+  }
+  /* Interview answer grades: red, orange, green, blue. */
+  .grade-bad {
+    @apply bg-error-container text-on-error-container;
+  }
+  .grade-poor {
+    @apply bg-orange-container text-on-orange-container;
+  }
+  .grade-good {
+    @apply bg-green-container text-on-green-container;
+  }
+  .grade-great {
+    @apply bg-primary-container text-on-primary-container;
+  }
+  .btn-sm {
+    @apply px-2.5 py-1 text-xs;
   }
   .chip-missing {
     @apply bg-error-container text-on-error-container;

@@ -28,7 +28,7 @@ export default async function BankPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Career bank</h1>
-          <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+          <p className="mt-1 text-sm text-fg-muted">
             Everything the app knows about your experience. Job matches only use what&apos;s here.
           </p>
         </div>
@@ -40,14 +40,14 @@ export default async function BankPage() {
       {groups.length === 0 ? (
         <div className="card text-center">
           <p className="font-medium">Your career bank is empty</p>
-          <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+          <p className="mt-1 text-sm text-fg-muted">
             Upload your resume or paste notes, and Claude will organize them into entries for you to review.
           </p>
         </div>
       ) : (
         groups.map((group) => (
           <section key={group.kind} className="space-y-3">
-            <h2 className="text-sm font-semibold tracking-wide text-stone-500 uppercase dark:text-stone-400">
+            <h2 className="text-sm font-semibold tracking-wide text-fg-muted uppercase">
               {KIND_LABELS[group.kind]}
             </h2>
             {group.entries.map((entry) => (

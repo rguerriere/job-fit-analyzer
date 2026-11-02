@@ -1,44 +1,91 @@
 @import "tailwindcss";
 
+/*
+ * Material-style dark theme. Every color lives here, so the look can be changed in one place.
+ * Each token becomes Tailwind classes, e.g. --color-fg-muted → text-fg-muted, bg-surface, border-outline.
+ * Text colors are chosen for clear contrast on these surfaces (WCAG AA or better).
+ */
 @theme {
-  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: Roboto, ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+  --color-canvas: #131516; /* page background */
+  --color-surface: #181a1b; /* cards, header: only slightly lighter than the page */
+  --color-surface-high: #26292b; /* chips, hovers, inputs */
+  --color-surface-highest: #474c50; /* badges that need to stand out from the card */
+  --color-outline: #3b4043; /* borders and dividers */
+
+  --color-fg: #e8e6e3; /* main text: off-white, easier on the eyes than pure white */
+  --color-fg-muted: #b3afa8; /* secondary text, still easy to read */
+
+  --color-primary: #5ea6ff; /* links, active tab, accents */
+  --color-primary-container: #0f3a7d; /* filled buttons: dark navy */
+  --color-primary-container-hover: #164b9e;
+  --color-on-primary-container: #dce8fd; /* text on filled buttons */
+
+  --color-error: #f2b8b5;
+  --color-error-container: #5c1a17;
+  --color-on-error-container: #ffdad6;
+  --color-warn-container: #4a3800;
+  --color-on-warn-container: #ffe08a;
+  --color-success-container: #00433b;
+  --color-on-success-container: #8ff0de;
 }
 
 @layer base {
+  html {
+    color-scheme: dark; /* dark scrollbars and form controls */
+  }
   body {
-    @apply bg-stone-50 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
+    @apply bg-canvas text-fg antialiased;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900;
+    @apply rounded-xl border border-outline bg-surface p-5;
   }
   .label {
-    @apply mb-1 block text-xs font-medium text-stone-600 dark:text-stone-400;
+    @apply mb-1 block text-sm font-medium text-fg-muted;
   }
   .input {
-    @apply w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900
-      placeholder:text-stone-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/30 focus:outline-none
-      dark:border-stone-700 dark:bg-stone-950 dark:text-stone-100;
+    @apply w-full rounded-md border border-outline bg-surface-high px-3 py-2 text-sm text-fg
+      placeholder:text-fg-muted/70 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:outline-none;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-3.5 py-2
-      text-sm font-medium text-stone-800 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50
-      dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-outline bg-surface-high px-3.5 py-2
+      text-sm font-medium text-fg hover:bg-outline disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply border-teal-700 bg-teal-700 text-white hover:bg-teal-800 dark:border-teal-600 dark:bg-teal-600
-      dark:hover:bg-teal-500;
+    @apply border-primary-container bg-primary-container text-on-primary-container hover:border-primary-container-hover
+      hover:bg-primary-container-hover;
   }
   .btn-danger {
-    @apply text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950;
+    @apply text-error hover:bg-error-container;
   }
   .alert-error {
-    @apply rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900
-      dark:bg-red-950 dark:text-red-200;
+    @apply rounded-md bg-error-container px-3 py-2 text-sm text-on-error-container;
+  }
+  .alert-warn {
+    @apply rounded-md bg-warn-container px-3 py-2 text-sm text-on-warn-container;
+  }
+  /* Score gradient: set --score-hue inline (see scoreLabel). Same lightness at every hue so all scores read equally well. */
+  .score-color {
+    color: oklch(0.82 0.15 var(--score-hue));
   }
   .chip {
-    @apply rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-700 dark:bg-stone-800 dark:text-stone-300;
+    @apply rounded-full bg-surface-high px-2.5 py-0.5 text-xs font-medium text-fg;
+  }
+  /* Required / Preferred: a lighter gray so it stands out from the card. */
+  .chip-importance {
+    @apply bg-surface-highest text-fg;
+  }
+  .chip-missing {
+    @apply bg-error-container text-on-error-container;
+  }
+  .chip-partial {
+    @apply bg-warn-container text-on-warn-container;
+  }
+  .chip-close {
+    @apply bg-success-container text-on-success-container;
   }
 }

@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+/** One requirement from a posting, before it is judged against the career bank. */
+export const RequirementItemSchema = z.object({
+  requirement: z
+    .string()
+    .describe("A short phrase that makes sense on its own, e.g. '3+ years React' or 'TensorFlow'."),
+  importance: z
+    .enum(["required", "preferred"])
+    .describe("From the posting's own sections; see the instructions."),
+});
+export type RequirementItem = z.infer<typeof RequirementItemSchema>;
+
 /**
  * The structured shape we extract from a raw job posting.
  * Field descriptions are sent to the model, so they double as instructions.
@@ -30,12 +41,9 @@ export const JobPostingSchema = z.object({
     })
     .nullable()
     .describe("Compensation range, or null if the posting gives no pay information."),
-  requiredSkills: z
-    .array(z.string())
-    .describe("Skills, tools, or qualifications the posting says are required. Short phrases."),
-  preferredSkills: z
-    .array(z.string())
-    .describe("Nice-to-have skills (\"preferred\", \"bonus\", \"plus\"). Short phrases."),
+  requirements: z
+    .array(RequirementItemSchema)
+    .describe("Every requirement the person will be judged against, built with the rules in the instructions."),
   responsibilities: z.array(z.string()).describe("Main duties of the role, one short phrase each."),
   applicationDeadline: z
     .string()
@@ -45,3 +53,6 @@ export const JobPostingSchema = z.object({
 });
 
 export type JobPosting = z.infer<typeof JobPostingSchema>;
+
+/** The posting facts saved with an opportunity. The requirement list is saved separately, with verdicts. */
+export type PostingDetails = Omit<JobPosting, "requirements">;

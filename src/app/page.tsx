@@ -42,7 +42,7 @@ export default async function HomePage() {
     <div className="space-y-10 py-6">
       <div className="max-w-2xl">
         <h1 className="text-3xl font-semibold tracking-tight">See how well you fit a job before you apply</h1>
-        <p className="mt-3 text-stone-600 dark:text-stone-400">
+        <p className="mt-3 text-fg-muted">
           Keep your experience in one place, then compare it against any job posting. Every match is backed by
           something you actually did, never invented.
         </p>
@@ -59,16 +59,16 @@ export default async function HomePage() {
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold tracking-wide text-stone-500 uppercase dark:text-stone-400">
+        <h2 className="text-sm font-semibold tracking-wide text-fg-muted uppercase">
           How it works
         </h2>
         <ol className="mt-3 grid gap-3 sm:grid-cols-3">
           {STEPS.map((step, i) => (
             <li key={step.href}>
-              <Link href={step.href} className="card block h-full hover:border-teal-600 dark:hover:border-teal-500">
-                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">{i + 1}</span>
+              <Link href={step.href} className="card block h-full hover:border-primary">
+                <span className="text-sm font-semibold text-primary">{i + 1}</span>
                 <p className="mt-1 font-medium">{step.title}</p>
-                <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{step.detail}</p>
+                <p className="mt-1 text-sm text-fg-muted">{step.detail}</p>
               </Link>
             </li>
           ))}

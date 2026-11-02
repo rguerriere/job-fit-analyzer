@@ -35,7 +35,7 @@ export default async function AnalyzePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Analyze a job posting</h1>
-        <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+        <p className="mt-1 text-sm text-fg-muted">
           Paste a posting to get a fit score and the requirements your career bank doesn&apos;t cover yet.
         </p>
       </div>
@@ -43,7 +43,7 @@ export default async function AnalyzePage() {
       {blocker ? (
         <div className="card">
           <p className="font-medium">{blocker.title}</p>
-          <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{blocker.detail}</p>
+          <p className="mt-1 text-sm text-fg-muted">{blocker.detail}</p>
           <Link href={blocker.href} className="btn btn-primary mt-3">
             {blocker.action}
           </Link>

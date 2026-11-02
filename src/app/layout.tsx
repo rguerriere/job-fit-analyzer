@@ -14,9 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // This only silences mismatched attributes on this one tag, not on the rest of the page.
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen">
-        <header className="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
+        <header className="border-b border-outline bg-surface">
           <nav className="mx-auto flex h-14 max-w-4xl items-center gap-6 px-4 text-sm">
-            <Link href="/" className="font-semibold text-teal-800 dark:text-teal-400">
+            <Link href="/" className="font-semibold text-primary">
               Job Fit Analyzer
             </Link>
             <NavLink href="/opportunities">Opportunities</NavLink>

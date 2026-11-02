@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { ENTRY_KINDS } from "../lib/schemas/bankEntry";
 import type { RequirementResult } from "../lib/schemas/fitAnalysis";
+import type { PostingDetails } from "../lib/schemas/jobPosting";
 
 const timestamps = {
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -57,6 +58,11 @@ export const analyses = sqliteTable(
     jobTitle: text("job_title").notNull(),
     company: text("company"),
     postingText: text("posting_text").notNull(),
+    // Salary, location, work arrangement, etc. from the extractor. Extracted once per posting and kept.
+    // Null for analyses made before it was added; Re-analyze fills it in.
+    details: text("details", { mode: "json" }).$type<PostingDetails>(),
+    // Which version of the extraction instructions produced details and the requirement list (EXTRACTION_VERSION).
+    extractionVersion: integer("extraction_version"),
     score: integer("score"),
     // Score before the most recent re-analysis, to show how it changed.
     previousScore: integer("previous_score"),

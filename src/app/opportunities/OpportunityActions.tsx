@@ -37,8 +37,8 @@ export function OpportunityActions({ id, jobTitle }: { id: string; jobTitle: str
           {isPending && action === "delete" ? "Deleting…" : "Delete"}
         </button>
         {isPending && action === "reanalyze" && (
-          <span className="text-sm text-stone-600 dark:text-stone-400">
-            Comparing it to your current career bank. This usually takes 20–60 seconds.
+          <span className="text-sm text-fg-muted">
+            Checking the same requirements against your current career bank. This usually takes 15–30 seconds.
           </span>
         )}
       </div>

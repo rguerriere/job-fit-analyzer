@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
 import { analyses } from "@/db/schema";
 import { getCurrentUser } from "@/lib/currentUser";
-import { runFitAnalysis } from "@/lib/opportunities";
+import { analyzeNewPosting } from "@/lib/opportunities";
 
 const MAX_POSTING_CHARS = 30_000;
 
@@ -19,7 +19,7 @@ export async function analyzePosting(formData: FormData): Promise<AnalyzeResult>
   }
 
   const user = await getCurrentUser();
-  const run = await runFitAnalysis(user, posting);
+  const run = await analyzeNewPosting(user, posting);
   if (!run.ok) return run;
 
   const [saved] = await db

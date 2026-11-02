@@ -66,7 +66,7 @@ export function EntryCard({ id, entry }: { id: string; entry: BankEntryDraft }) 
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="font-medium">{entry.title}</h3>
-          {meta && <p className="text-sm text-stone-600 dark:text-stone-400">{meta}</p>}
+          {meta && <p className="text-sm text-fg-muted">{meta}</p>}
         </div>
         <div className="flex shrink-0 gap-1">
           <button type="button" className="btn px-2.5 py-1 text-xs" onClick={() => setEditing(true)}>

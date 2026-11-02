@@ -11,8 +11,8 @@ export function ApiKeyForm({ maskedKey }: { maskedKey: string | null }) {
     <div className="space-y-3">
       {maskedKey && (
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-stone-600 dark:text-stone-400">Saved key:</span>
-          <code className="rounded bg-stone-100 px-2 py-0.5 dark:bg-stone-800">{maskedKey}</code>
+          <span className="text-fg-muted">Saved key:</span>
+          <code className="rounded bg-surface-high px-2 py-0.5">{maskedKey}</code>
           <button
             type="button"
             className="btn btn-danger"
@@ -44,7 +44,7 @@ export function ApiKeyForm({ maskedKey }: { maskedKey: string | null }) {
 
       {state.status === "error" && <p className="alert-error">{state.message}</p>}
       {state.status === "saved" && (
-        <p className="text-sm text-teal-700 dark:text-teal-400">Key checked and saved.</p>
+        <p className="text-sm text-primary">Key checked and saved.</p>
       )}
     </div>
   );

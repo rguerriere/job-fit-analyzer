@@ -50,7 +50,7 @@ export function ImportForm() {
     const selected = items.filter((item) => item.include);
     return (
       <div className="space-y-4">
-        <p className="text-sm text-stone-600 dark:text-stone-400">
+        <p className="text-sm text-fg-muted">
           Claude found {items.length} {items.length === 1 ? "entry" : "entries"}. Check each one, fix anything
           that&apos;s wrong, and untick any you don&apos;t want.
         </p>
@@ -60,11 +60,11 @@ export function ImportForm() {
             <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
-                className="size-4 accent-teal-700"
+                className="size-4 accent-primary"
                 checked={item.include}
                 onChange={(e) => update(item.key, { include: e.target.checked })}
               />
-              Include · <span className="text-stone-500">{KIND_LABELS[item.draft.kind]}</span>
+              Include · <span className="text-fg-muted">{KIND_LABELS[item.draft.kind]}</span>
             </label>
             {item.include && <EntryFields value={item.draft} onChange={(draft) => update(item.key, { draft })} />}
           </div>
@@ -72,7 +72,7 @@ export function ImportForm() {
 
         {error && <p className="alert-error">{error}</p>}
 
-        <div className="sticky bottom-0 -mx-4 flex flex-wrap gap-2 border-t border-stone-200 bg-stone-50/95 px-4 py-3 backdrop-blur dark:border-stone-800 dark:bg-stone-950/95">
+        <div className="sticky bottom-0 -mx-4 flex flex-wrap gap-2 border-t border-outline bg-canvas/95 px-4 py-3 backdrop-blur">
           <button
             type="button"
             className="btn btn-primary"
@@ -92,7 +92,7 @@ export function ImportForm() {
   // Step 1: upload or paste.
   return (
     <form action={extract} className="card space-y-4">
-      <div className="flex gap-1 rounded-lg bg-stone-100 p-1 text-sm dark:bg-stone-800" role="tablist">
+      <div className="flex gap-1 rounded-lg bg-surface-high p-1 text-sm" role="tablist">
         {(["upload", "paste"] as const).map((m) => (
           <button
             key={m}
@@ -102,8 +102,8 @@ export function ImportForm() {
             onClick={() => setMode(m)}
             className={`flex-1 rounded-md px-3 py-1.5 font-medium ${
               mode === m
-                ? "bg-white shadow-sm dark:bg-stone-950"
-                : "text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+                ? "bg-surface font-medium text-fg shadow-sm"
+                : "text-fg-muted hover:text-fg"
             }`}
           >
             {m === "upload" ? "Upload resume" : "Paste text"}
@@ -122,7 +122,7 @@ export function ImportForm() {
             type="file"
             accept=".pdf,.docx,.txt,.md"
             required
-            className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-teal-700 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-800"
+            className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary-container file:px-3 file:py-2 file:text-sm file:font-medium file:text-on-primary-container hover:file:bg-primary-container-hover"
           />
         </div>
       ) : (
@@ -145,10 +145,10 @@ export function ImportForm() {
 
       <div className="flex items-center gap-3">
         <button type="submit" className="btn btn-primary" disabled={isExtracting}>
-          {isExtracting ? "Reading…" : "Find entries"}
+          {isExtracting ? "Reading…" : mode === "upload" ? "Upload" : "Submit"}
         </button>
         {isExtracting && (
-          <span className="text-sm text-stone-600 dark:text-stone-400">
+          <span className="text-sm text-fg-muted">
             Claude is reading it. This usually takes 20–60 seconds.
           </span>
         )}

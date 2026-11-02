@@ -14,8 +14,8 @@ export function NavLink({ href, children, className = "" }: { href: string; chil
       aria-current={active ? "page" : undefined}
       className={`flex h-full items-center border-b-2 ${
         active
-          ? "border-teal-600 font-medium text-stone-900 dark:border-teal-400 dark:text-white"
-          : "border-transparent text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white"
+          ? "border-primary font-medium text-fg"
+          : "border-transparent text-fg-muted hover:text-fg"
       } ${className}`}
     >
       {children}

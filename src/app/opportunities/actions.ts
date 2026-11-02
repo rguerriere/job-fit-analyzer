@@ -5,11 +5,11 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
 import { analyses } from "@/db/schema";
 import { getCurrentUser } from "@/lib/currentUser";
-import { runFitAnalysis } from "@/lib/opportunities";
+import { reanalyzeSaved } from "@/lib/opportunities";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-/** Re-runs a saved posting against the current career bank and keeps the old score for comparison. */
+/** Re-judges a saved posting against the current career bank. The requirement list stays the same. */
 export async function reanalyzeOpportunity(id: string): Promise<ActionResult> {
   const user = await getCurrentUser();
   const existing = await db.query.analyses.findFirst({
@@ -17,7 +17,7 @@ export async function reanalyzeOpportunity(id: string): Promise<ActionResult> {
   });
   if (!existing) return { ok: false, error: "That opportunity no longer exists." };
 
-  const run = await runFitAnalysis(user, existing.postingText);
+  const run = await reanalyzeSaved(user, existing);
   if (!run.ok) return run;
 
   await db

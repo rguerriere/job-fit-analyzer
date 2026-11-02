@@ -42,8 +42,9 @@ export function AnalyzeForm() {
           {isAnalyzing ? "Analyzing…" : "Analyze fit"}
         </button>
         {isAnalyzing && (
-          <span className="text-sm text-stone-600 dark:text-stone-400">
-            Claude is comparing it to your career bank. This usually takes 20–60 seconds.
+          <span className="text-sm text-fg-muted">
+            Claude reads the posting, then checks each requirement against your career bank. This usually takes
+            30–60 seconds.
           </span>
         )}
       </div>

@@ -15,6 +15,13 @@
       "when": 1793507929369,
       "tag": "0001_material_marten_broadcloak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793597046871,
+      "tag": "0002_warm_the_fallen",
+      "breakpoints": true
     }
   ]
 }

@@ -21,8 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <NavLink href="/opportunities">Opportunities</NavLink>
             <NavLink href="/analyze">Analyze a job</NavLink>
-            <NavLink href="/bank">Career bank</NavLink>
             <NavLink href="/interview-prep">Interview Prep</NavLink>
+            {/* Career bank stays the last main tab; add new pages before it. */}
+            <NavLink href="/bank">Career bank</NavLink>
             <NavLink href="/settings" className="ml-auto">
               Settings
             </NavLink>

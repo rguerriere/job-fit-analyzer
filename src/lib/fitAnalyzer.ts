@@ -12,10 +12,17 @@ is more useful than a generous match.
 
 Rules:
 - Give exactly one verdict per requirement, in the order given, copying each requirement's text.
-- Judge only from the career bank. Do not assume skills it doesn't show, even common ones.
+- Judge from the career bank, making the inferences a hiring manager would. Everyday practices of the
+  person's field (for a developer: Git and version control, pull requests, code review, reading others'
+  code, debugging, basic testing) count as strong when their professional experience clearly involves
+  them, especially if the skill is also listed. Do not invent experience the bank doesn't support: a
+  specific tool or domain they never show stays none.
+- Match the bar to the wording. "Familiarity with", "exposure to", or "basic knowledge of" needs less
+  evidence than "expert in", "deep experience with", or a number of years.
 - Reasonable equivalents count: a Bachelor's in Computer Science meets "degree in a related field",
   and using PostgreSQL shows "SQL". A different tool in the same family (e.g. Vue for React) is partial.
-- A skill that is only listed (in a skills section) with no role or project showing it is partial.
+- A specialized skill that is only listed (in a skills section) with no role or project showing it is
+  partial. (Everyday practices backed by years of relevant work are the exception above.)
   Hands-on work that covers most of a requirement in a different setting is close.
 - An item that names several tools or languages is judged as a whole: strong if the bank shows
   most of them in real work, close or partial if it shows some, none if it shows none.

@@ -108,12 +108,10 @@ export function PrepTabs({
 /** A section's title and description, with a button that expands or collapses all of its cards. */
 export function SectionHeader({ title, children }: { title: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [allOpen, setAllOpen] = useState(false);
 
-  function toggleAll() {
-    const next = !allOpen;
-    ref.current?.parentElement?.querySelectorAll("details").forEach((d) => (d.open = next));
-    setAllOpen(next);
+  /** Opens or closes every card in this section. */
+  function setAll(open: boolean) {
+    ref.current?.parentElement?.querySelectorAll("details").forEach((d) => (d.open = open));
   }
 
   return (
@@ -122,9 +120,14 @@ export function SectionHeader({ title, children }: { title: string; children: Re
         <h2 className="text-lg font-semibold">{title}</h2>
         <p className="mt-1 text-sm text-fg-muted">{children}</p>
       </div>
-      <button type="button" className="btn btn-sm shrink-0" onClick={toggleAll}>
-        {allOpen ? "Collapse all" : "Expand all"}
-      </button>
+      <div className="flex shrink-0 gap-2">
+        <button type="button" className="btn btn-sm" onClick={() => setAll(true)}>
+          Expand all
+        </button>
+        <button type="button" className="btn btn-sm" onClick={() => setAll(false)}>
+          Collapse all
+        </button>
+      </div>
     </div>
   );
 }

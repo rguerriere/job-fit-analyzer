@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import type { Grade } from "@/lib/schemas/answerGrade";
-import { gradeAnswer, saveAnswer } from "./actions";
+import type { ActionResult, GradeResult } from "./actions";
 import { GradeBadge } from "./GradeBadge";
 import { useReportProgress } from "./progress";
 
@@ -19,30 +19,36 @@ export type SavedAnswer = {
 type GradeState = { grade: Grade; feedback: string; gradedAnswer: string; gradedFor: string | null };
 
 /**
- * One answer box: saves automatically while you type, and grades on request (unless `gradable` is false,
- * as for Skills Deep Dive notes, which get a compact one-line box instead).
- * `bulletIndex` is ROLE_ANSWER (-1) for the question about the position as a whole.
+ * One answer box, used by every Interview Prep section: saves automatically while you type, and grades on
+ * request. Without `grade` (Skills Deep Dive notes) it's a compact, ungraded one-line box.
+ * The page passes in `save` and `grade` already bound to the item, so this box works for any section.
  */
 export function AnswerBox({
-  positionId,
-  bulletIndex,
+  progress,
+  save,
+  grade: gradeAction,
   target,
-  kind,
+  targetLabel,
   placeholder,
   initial,
-  gradable = true,
 }: {
-  positionId: string;
-  bulletIndex: number;
-  /** The bullet (or role details) as shown now, to tell whether a grade was for older text. */
+  /** Which card counter this box counts toward: the card's ID and this item's ID within it. */
+  progress: { group: string; item: string | number };
+  save: (text: string) => Promise<ActionResult>;
+  grade?: () => Promise<GradeResult>;
+  /** What the answer is about (bullet, role details, or question) as shown now, to spot outdated grades. */
   target: string;
-  kind: "role" | "bullet";
+  /** Names `target` in "… changed since grading": "Bullet", "Role details", or "Question". */
+  targetLabel: string;
   placeholder: string;
   initial?: SavedAnswer;
-  gradable?: boolean;
 }) {
+  const gradable = gradeAction !== undefined;
   const [answer, setAnswer] = useState(initial?.answer ?? "");
-  useReportProgress(positionId, bulletIndex, answer);
+  useReportProgress(progress.group, progress.item, answer);
+  // The page may pass a new `save` function on re-render; always use the latest one.
+  const saveRef = useRef(save);
+  saveRef.current = save;
   const [graded, setGraded] = useState<GradeState | null>(
     initial?.grade && initial.feedback && initial.gradedAnswer !== null
       ? {
@@ -70,7 +76,7 @@ export function AnswerBox({
     queue.current = queue.current.then(async () => {
       if (text === lastSaved.current) return true;
       setStatus("saving");
-      const result = await saveAnswer(positionId, bulletIndex, text);
+      const result = await saveRef.current(text);
       if (!result.ok) {
         setStatus("failed");
         setError(result.error);
@@ -97,17 +103,18 @@ export function AnswerBox({
     () => () => {
       clearTimeout(timer.current);
       if (pending.current !== null && pending.current !== lastSaved.current) {
-        void saveAnswer(positionId, bulletIndex, pending.current);
+        void saveRef.current(pending.current);
       }
     },
-    [positionId, bulletIndex],
+    [],
   );
 
   function grade() {
+    if (!gradeAction) return;
     setError(null);
     startGrading(async () => {
       if (!(await flush(answer))) return;
-      const result = await gradeAnswer(positionId, bulletIndex);
+      const result = await gradeAction();
       if (result.ok) {
         setGraded({
           grade: result.grade,
@@ -121,14 +128,13 @@ export function AnswerBox({
   }
 
   const hasAnswer = answer.trim().length > 0;
-  const what = kind === "role" ? "Role details" : "Bullet";
   // Why the grade may no longer apply. Older grades (before this was tracked) have no gradedFor.
   const outdatedReason = !graded
     ? null
     : graded.gradedAnswer.trim() !== answer.trim()
       ? "Answer changed since grading"
       : graded.gradedFor !== null && graded.gradedFor !== target
-        ? `${what} changed since grading`
+        ? `${targetLabel} changed since grading`
         : null;
   const statusText = { idle: "", saving: "Saving…", saved: "Saved", failed: "Not saved" }[status];
 

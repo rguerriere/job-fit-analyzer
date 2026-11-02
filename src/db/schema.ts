@@ -158,6 +158,40 @@ export const interviewPrepState = sqliteTable("interview_prep_state", {
   ...timestamps,
 });
 
+/**
+ * Interview Prep → Interview Q&A: a question and the user's prepared answer to it.
+ * Default questions (defaultKey set) sync to DEFAULT_QUESTIONS on each page load; custom questions
+ * (defaultKey null, coming later) belong to the user alone.
+ */
+export const qaQuestions = sqliteTable(
+  "qa_questions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    defaultKey: text("default_key"),
+    groupId: text("group_id").notNull(),
+    sortOrder: integer("sort_order").notNull(),
+    text: text("text").notNull(),
+    hint: text("hint"),
+    // Behavioral question: graded partly on STAR structure.
+    star: integer("star", { mode: "boolean" }).notNull().default(false),
+    answer: text("answer").notNull().default(""),
+    grade: text("grade", { enum: GRADES }),
+    feedback: text("feedback"),
+    // The answer and the question as they were when graded; if either changed, the grade is dimmed.
+    gradedAnswer: text("graded_answer"),
+    gradedFor: text("graded_for"),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("qa_questions_default_idx").on(t.userId, t.defaultKey)],
+);
+
+export type QaQuestion = typeof qaQuestions.$inferSelect;
+
 export type User = typeof users.$inferSelect;
 export type BankEntry = typeof bankEntries.$inferSelect;
 export type Analysis = typeof analyses.$inferSelect;

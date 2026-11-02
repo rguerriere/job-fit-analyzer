@@ -3,10 +3,14 @@ import type { ReactNode } from "react";
 import { type DeepDiveAnswer, type DeepDivePosition, ROLE_ANSWER } from "@/db/schema";
 import { getCurrentUser } from "@/lib/currentUser";
 import { loadDeepDive, roleText } from "@/lib/deepDive";
+import { loadQuestions } from "@/lib/interviewQA";
+import { QUESTION_GROUPS } from "@/lib/interviewQuestions";
+import { gradeAnswer, saveAnswer } from "./actions";
 import { AnswerBox, type SavedAnswer } from "./AnswerBox";
 import { BankChangedBanner } from "./BankChangedBanner";
 import { PrepTabs, SectionHeader } from "./PrepTabs";
 import { ProgressChip } from "./progress";
+import { gradeQaAnswer, saveQaAnswer } from "./qaActions";
 import { PREP_TABS, type PrepTab } from "./tabs";
 
 export const dynamic = "force-dynamic";
@@ -85,13 +89,19 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
   const { tab } = await searchParams;
   const initialTab: PrepTab = PREP_TABS.includes(tab as PrepTab) ? (tab as PrepTab) : "resume";
   const user = await getCurrentUser();
-  const { jobs, skillGroups, answers, version, bankChanged } = await loadDeepDive(user.id);
+  const [{ jobs, skillGroups, answers, version, bankChanged }, questions] = await Promise.all([
+    loadDeepDive(user.id),
+    loadQuestions(user.id),
+  ]);
 
   const tabInfo = (positions: DeepDivePosition[], boxesPerPosition: (p: DeepDivePosition) => number) => ({
     positionIds: positions.map((p) => p.id),
     total: positions.reduce((n, p) => n + boxesPerPosition(p), 0),
   });
-  const initiallyFilled = answers.filter((a) => a.answer.trim()).map((a) => `${a.positionId}:${a.bulletIndex}`);
+  const initiallyFilled = [
+    ...answers.filter((a) => a.answer.trim()).map((a) => `${a.positionId}:${a.bulletIndex}`),
+    ...questions.filter((q) => q.answer.trim()).map((q) => `qa:${q.groupId}:${q.id}`),
+  ];
 
   const resumePanel = (
     <section className="space-y-4">
@@ -123,10 +133,11 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
                         did you do there?&rdquo;
                       </p>
                       <AnswerBox
-                        positionId={position.id}
-                        bulletIndex={ROLE_ANSWER}
+                        progress={{ group: position.id, item: ROLE_ANSWER }}
+                        save={saveAnswer.bind(null, position.id, ROLE_ANSWER)}
+                        grade={gradeAnswer.bind(null, position.id, ROLE_ANSWER)}
                         target={roleText(position)}
-                        kind="role"
+                        targetLabel="Role details"
                         initial={toSaved(mine.get(ROLE_ANSWER))}
                         placeholder="What the role was, what you owned, what you worked with…"
                       />
@@ -139,10 +150,11 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
                           <div key={b} className="space-y-2">
                             <p className="border-l-2 border-primary pl-3 text-sm">{bullet}</p>
                             <AnswerBox
-                              positionId={position.id}
-                              bulletIndex={b}
+                              progress={{ group: position.id, item: b }}
+                              save={saveAnswer.bind(null, position.id, b)}
+                              grade={gradeAnswer.bind(null, position.id, b)}
                               target={bullet}
-                              kind="bullet"
+                              targetLabel="Bullet"
                               initial={toSaved(mine.get(b))}
                               placeholder="How you did it, the tools, your part, what came of it…"
                             />
@@ -183,11 +195,10 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
                       >
                         <span className="text-sm font-medium">{skill}</span>
                         <AnswerBox
-                          positionId={group.id}
-                          bulletIndex={s}
+                          progress={{ group: group.id, item: s }}
+                          save={saveAnswer.bind(null, group.id, s)}
                           target={skill}
-                          kind="bullet"
-                          gradable={false}
+                          targetLabel="Skill"
                           initial={toSaved(mine.get(s))}
                           placeholder="Where you used it: a class, project, or job"
                         />
@@ -204,13 +215,53 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
   );
 
   const qaPanel = (
-    <section className="card flex flex-col items-center gap-3 py-12 text-center">
-      <span className="chip chip-importance">Coming soon</span>
-      <h2 className="text-lg font-semibold">Interview Q&amp;A</h2>
-      <p className="max-w-md text-sm text-fg-muted">
-        Common screening and behavioral questions, like &ldquo;Tell me about yourself&rdquo; and &ldquo;Describe a time
-        you disagreed with a teammate,&rdquo; with space to prepare your answers.
-      </p>
+    <section className="space-y-4">
+      <SectionHeader title="Interview Q&A">
+        Prepare answers to the questions most interviews include. Behavioral questions are graded partly on STAR
+        structure: the Situation, your Task, the Actions you took, and the Result.
+      </SectionHeader>
+      <ul className="space-y-3">
+        {QUESTION_GROUPS.map((group) => {
+          const items = questions.filter((q) => q.groupId === group.id);
+          if (items.length === 0) return null;
+          return (
+            <li key={group.id}>
+              <Card positionId={`qa:${group.id}`} title={group.title} total={items.length} label="answered">
+                <div className="space-y-6">
+                  {items.map((q) => (
+                    <div key={q.id} className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-medium">{q.text}</h3>
+                        {q.star && (
+                          <span className="chip chip-importance" title="Graded partly on STAR structure">
+                            STAR
+                          </span>
+                        )}
+                      </div>
+                      {q.hint && <p className="text-sm text-fg-muted italic">{q.hint}</p>}
+                      <AnswerBox
+                        progress={{ group: `qa:${group.id}`, item: q.id }}
+                        save={saveQaAnswer.bind(null, q.id)}
+                        grade={gradeQaAnswer.bind(null, q.id)}
+                        target={q.text}
+                        targetLabel="Question"
+                        initial={{
+                          answer: q.answer,
+                          grade: q.grade,
+                          feedback: q.feedback,
+                          gradedAnswer: q.gradedAnswer,
+                          gradedFor: q.gradedFor,
+                        }}
+                        placeholder="Your answer, in your own words…"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 
@@ -230,7 +281,12 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
         tabs={[
           { id: "resume", label: "Resume Deep Dive", ...tabInfo(jobs, (p) => p.bullets.length + 1) },
           { id: "skills", label: "Skills Deep Dive", ...tabInfo(skillGroups, (p) => p.bullets.length) },
-          { id: "qa", label: "Interview Q&A", positionIds: [], total: 0, soon: true },
+          {
+            id: "qa",
+            label: "Interview Q&A",
+            positionIds: QUESTION_GROUPS.map((g) => `qa:${g.id}`),
+            total: questions.length,
+          },
         ]}
         initiallyFilled={initiallyFilled}
         version={version}

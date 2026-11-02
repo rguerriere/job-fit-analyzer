@@ -5,7 +5,7 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useM
 /**
  * Live progress for the "N of M answered/noted" counters. Each answer box reports whether it has text,
  * so the counters on cards and tabs update as you type or clear a box, without reloading.
- * A box is identified as "positionId:itemIndex".
+ * A box is identified as "group:item", where group is its card (a position, skill group, or question group).
  */
 type Progress = { filled: Set<string>; report: (key: string, hasText: boolean) => void };
 
@@ -26,11 +26,11 @@ export function ProgressProvider({ initiallyFilled, children }: { initiallyFille
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
 }
 
-/** Called by each answer box with its current text. */
-export function useReportProgress(positionId: string, itemIndex: number, text: string) {
+/** Called by each answer box with its current text. `group` is the card it belongs to. */
+export function useReportProgress(group: string, item: string | number, text: string) {
   const report = useContext(ProgressContext)?.report;
   const hasText = text.trim().length > 0;
-  useEffect(() => report?.(`${positionId}:${itemIndex}`, hasText), [report, positionId, itemIndex, hasText]);
+  useEffect(() => report?.(`${group}:${item}`, hasText), [report, group, item, hasText]);
 }
 
 /** How many boxes in these positions have text. */

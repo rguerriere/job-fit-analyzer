@@ -33,7 +33,7 @@ const prompt = ChatPromptTemplate.fromMessages([
 export type FitInput = { entries: BankEntry[]; requirements: RequirementItem[] };
 
 /** Writes the career bank as plain text with short IDs, so Claude can cite entries. */
-function formatBank(entries: BankEntry[]): string {
+export function formatBank(entries: BankEntry[]): string {
   return entries
     .map((e, i) => {
       const dates = e.startDate || e.endDate ? ` (${e.startDate ?? "?"} to ${e.endDate ?? "?"})` : "";

@@ -12,13 +12,18 @@ A strong answer supports the bullet (or, for a question about the role, describe
 detail beyond what the resume already says: how they did it, the tools, their own part, the scale,
 or what resulted.
 
+Explaining the "what" is a big part of the grade. The interviewer doesn't know their company's
+systems, so when the answer involves a platform, module, product, or project (for example an internal
+"Vessel Reporting Platform"), a strong answer says in plain words what it is and what it does or who
+uses it. An answer that dives into details without ever saying what the thing is cannot be great.
+
 Grades:
 - bad: nonsense, unrelated to the question, or clearly made up or absurd for this role. This is rare.
   An answer that is on topic but weak is poor, not bad.
 - poor: on topic but vague, or mostly repeats the bullet without adding anything.
 - good: adds at least one concrete detail, such as how they did it, the tools, their part, or the scale.
-- great: specific and concise, and makes clear what they personally did and why it mattered or what
-  resulted. Ready to say out loud.
+- great: specific and concise, explains in plain words what the thing is, and makes clear what they
+  personally did and why it mattered or what resulted. Ready to say out loud.
 
 Do not lower a grade for being short, informal, or missing numbers. Judge the substance only.`;
 

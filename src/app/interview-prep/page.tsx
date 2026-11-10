@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { type DeepDiveAnswer, type DeepDivePosition, ROLE_ANSWER } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/db/client";
+import { type DeepDiveAnswer, type DeepDivePosition, ROLE_ANSWER, techGroups, techQuestions } from "@/db/schema";
 import { getCurrentUser } from "@/lib/currentUser";
 import { loadDeepDive, roleText } from "@/lib/deepDive";
 import { loadQuestions } from "@/lib/interviewQA";
@@ -11,6 +13,8 @@ import { BankChangedBanner } from "./BankChangedBanner";
 import { PrepTabs, SectionHeader } from "./PrepTabs";
 import { ProgressChip } from "./progress";
 import { gradeQaAnswer, saveQaAnswer } from "./qaActions";
+import { saveTechAnswer } from "./techActions";
+import { AddTechGroup, AddTechQuestion, TechGroupToolbar, TechQuestionHeader } from "./TechQA";
 import { PREP_TABS, type PrepTab } from "./tabs";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +48,7 @@ function Card({
   subtitle,
   total,
   label,
+  open,
   children,
 }: {
   positionId: string;
@@ -51,10 +56,12 @@ function Card({
   subtitle?: string | null;
   total: number;
   label: string;
+  /** Start expanded (used for empty Tech Q&A groups, so you can add questions right away). */
+  open?: boolean;
   children: ReactNode;
 }) {
   return (
-    <details className="group rounded-xl border border-outline bg-surface">
+    <details open={open} className="group rounded-xl border border-outline bg-surface">
       <summary className="sticky top-14 z-10 flex cursor-pointer list-none items-center gap-4 rounded-xl bg-surface px-5 py-4 select-none group-open:rounded-b-none group-open:border-b group-open:border-outline [&::-webkit-details-marker]:hidden">
         <span className="text-fg-muted transition-transform group-open:rotate-90" aria-hidden>
           ▸
@@ -89,10 +96,13 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
   const { tab } = await searchParams;
   const initialTab: PrepTab = PREP_TABS.includes(tab as PrepTab) ? (tab as PrepTab) : "resume";
   const user = await getCurrentUser();
-  const [{ jobs, skillGroups, answers, version, bankChanged }, questions] = await Promise.all([
-    loadDeepDive(user.id),
-    loadQuestions(user.id),
-  ]);
+  const [{ jobs, skillGroups, answers, version, bankChanged }, questions, techGroupRows, techQuestionRows] =
+    await Promise.all([
+      loadDeepDive(user.id),
+      loadQuestions(user.id),
+      db.select().from(techGroups).where(eq(techGroups.userId, user.id)).orderBy(asc(techGroups.sortOrder)),
+      db.select().from(techQuestions).where(eq(techQuestions.userId, user.id)).orderBy(asc(techQuestions.sortOrder)),
+    ]);
 
   const tabInfo = (positions: DeepDivePosition[], boxesPerPosition: (p: DeepDivePosition) => number) => ({
     positionIds: positions.map((p) => p.id),
@@ -101,6 +111,7 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
   const initiallyFilled = [
     ...answers.filter((a) => a.answer.trim()).map((a) => `${a.positionId}:${a.bulletIndex}`),
     ...questions.filter((q) => q.answer.trim()).map((q) => `qa:${q.groupId}:${q.id}`),
+    ...techQuestionRows.filter((q) => q.answer.trim()).map((q) => `tech:${q.groupId}:${q.id}`),
   ];
 
   const resumePanel = (
@@ -199,6 +210,7 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
                           save={saveAnswer.bind(null, group.id, s)}
                           target={skill}
                           targetLabel="Skill"
+                          compact
                           initial={toSaved(mine.get(s))}
                           placeholder="Where you used it: a class, project, or job"
                         />
@@ -265,6 +277,67 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
     </section>
   );
 
+  const techPanel = (
+    <section className="space-y-4">
+      <SectionHeader title="Tech Q&A">
+        Your own technical questions, grouped by topic. Add a question, write your answer, and edit or delete
+        either anytime. Nothing here is graded.
+      </SectionHeader>
+      {techGroupRows.length === 0 ? (
+        <div className="card space-y-3">
+          <div className="text-center">
+            <p className="font-medium">No groups yet</p>
+            <p className="mt-1 text-sm text-fg-muted">
+              Start with a topic you expect to be asked about, then add questions to it.
+            </p>
+          </div>
+          <AddTechGroup first />
+        </div>
+      ) : (
+        <>
+          <ul className="space-y-3">
+            {techGroupRows.map((group) => {
+              const items = techQuestionRows.filter((q) => q.groupId === group.id);
+              return (
+                <li key={group.id}>
+                  <Card
+                    positionId={`tech:${group.id}`}
+                    title={group.title}
+                    total={items.length}
+                    label="answered"
+                    open={items.length === 0}
+                  >
+                    <div className="space-y-5">
+                      <TechGroupToolbar id={group.id} title={group.title} questionCount={items.length} />
+                      {items.length === 0 && (
+                        <p className="text-sm text-fg-muted">No questions in this group yet. Add one below.</p>
+                      )}
+                      {items.map((q) => (
+                        <div key={q.id} className="space-y-2">
+                          <TechQuestionHeader id={q.id} groupId={group.id} text={q.text} />
+                          <AnswerBox
+                            progress={{ group: `tech:${group.id}`, item: q.id }}
+                            save={saveTechAnswer.bind(null, q.id)}
+                            target={q.text}
+                            targetLabel="Question"
+                            initial={{ answer: q.answer, grade: null, feedback: null, gradedAnswer: null, gradedFor: null }}
+                            placeholder="Your answer…"
+                          />
+                        </div>
+                      ))}
+                      <AddTechQuestion groupId={group.id} />
+                    </div>
+                  </Card>
+                </li>
+              );
+            })}
+          </ul>
+          <AddTechGroup first={false} />
+        </>
+      )}
+    </section>
+  );
+
   return (
     <div className="space-y-6">
       <div>
@@ -287,10 +360,16 @@ export default async function InterviewPrepPage({ searchParams }: { searchParams
             positionIds: QUESTION_GROUPS.map((g) => `qa:${g.id}`),
             total: questions.length,
           },
+          {
+            id: "tech",
+            label: "Tech Q&A",
+            positionIds: techGroupRows.map((g) => `tech:${g.id}`),
+            total: techQuestionRows.length,
+          },
         ]}
         initiallyFilled={initiallyFilled}
         version={version}
-        panels={{ resume: resumePanel, skills: skillsPanel, qa: qaPanel }}
+        panels={{ resume: resumePanel, skills: skillsPanel, qa: qaPanel, tech: techPanel }}
       />
     </div>
   );

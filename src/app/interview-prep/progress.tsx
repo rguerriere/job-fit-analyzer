@@ -30,7 +30,11 @@ export function ProgressProvider({ initiallyFilled, children }: { initiallyFille
 export function useReportProgress(group: string, item: string | number, text: string) {
   const report = useContext(ProgressContext)?.report;
   const hasText = text.trim().length > 0;
-  useEffect(() => report?.(`${group}:${item}`, hasText), [report, group, item, hasText]);
+  useEffect(() => {
+    report?.(`${group}:${item}`, hasText);
+  }, [report, group, item, hasText]);
+  // When the box goes away (its question was deleted), stop counting it.
+  useEffect(() => () => report?.(`${group}:${item}`, false), [report, group, item]);
 }
 
 /** How many boxes in these positions have text. */
@@ -51,4 +55,9 @@ export function ProgressChip({ positionId, total, label }: { positionId: string;
       {done} of {total} {label}
     </span>
   );
+}
+
+/** Whether one box currently has text (live, as you type). */
+export function useHasText(group: string, item: string | number): boolean {
+  return useContext(ProgressContext)?.filled.has(`${group}:${item}`) ?? false;
 }

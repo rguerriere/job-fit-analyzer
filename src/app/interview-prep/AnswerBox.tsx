@@ -20,7 +20,7 @@ type GradeState = { grade: Grade; feedback: string; gradedAnswer: string; graded
 
 /**
  * One answer box, used by every Interview Prep section: saves automatically while you type, and grades on
- * request. Without `grade` (Skills Deep Dive notes) it's a compact, ungraded one-line box.
+ * request. Without `grade` it's ungraded; `compact` makes it a one-line box (Skills Deep Dive notes).
  * The page passes in `save` and `grade` already bound to the item, so this box works for any section.
  */
 export function AnswerBox({
@@ -31,6 +31,7 @@ export function AnswerBox({
   targetLabel,
   placeholder,
   initial,
+  compact = false,
 }: {
   /** Which card counter this box counts toward: the card's ID and this item's ID within it. */
   progress: { group: string; item: string | number };
@@ -42,6 +43,7 @@ export function AnswerBox({
   targetLabel: string;
   placeholder: string;
   initial?: SavedAnswer;
+  compact?: boolean;
 }) {
   const gradable = gradeAction !== undefined;
   const [answer, setAnswer] = useState(initial?.answer ?? "");
@@ -143,11 +145,11 @@ export function AnswerBox({
       value={answer}
       onChange={(e) => onChange(e.target.value)}
       onBlur={() => void flush(answer)}
-      rows={gradable ? 2 : 1}
+      rows={compact ? 1 : 2}
       maxLength={5000}
       placeholder={placeholder}
       aria-label={placeholder}
-      className={`input resize-y [field-sizing:content] ${gradable ? "min-h-16" : "min-h-9 py-1.5"}`}
+      className={`input resize-y [field-sizing:content] ${compact ? "min-h-9 py-1.5" : "min-h-16"}`}
     />
   );
   const statusLine = (
@@ -159,7 +161,7 @@ export function AnswerBox({
   if (!gradable) {
     return (
       <div>
-        <div className="flex items-center gap-2">
+        <div className={`flex gap-2 ${compact ? "items-center" : "items-start"}`}>
           {textarea}
           <span className="w-14 shrink-0">{statusLine}</span>
         </div>

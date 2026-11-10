@@ -43,6 +43,13 @@
       "when": 1793605445737,
       "tag": "0005_soft_morlocks",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794289682133,
+      "tag": "0006_married_natasha_romanoff",
+      "breakpoints": true
     }
   ]
 }

@@ -192,6 +192,47 @@ export const qaQuestions = sqliteTable(
 
 export type QaQuestion = typeof qaQuestions.$inferSelect;
 
+/** Interview Prep → Tech Q&A: the user's own topic groups (e.g. "JavaScript", "SQL"). No AI involved. */
+export const techGroups = sqliteTable(
+  "tech_groups",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    sortOrder: integer("sort_order").notNull(),
+    ...timestamps,
+  },
+  (t) => [index("tech_groups_user_idx").on(t.userId)],
+);
+
+/** A question the user wrote in a Tech Q&A group, and their answer. Deleting the group deletes these. */
+export const techQuestions = sqliteTable(
+  "tech_questions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    groupId: text("group_id")
+      .notNull()
+      .references(() => techGroups.id, { onDelete: "cascade" }),
+    text: text("text").notNull(),
+    answer: text("answer").notNull().default(""),
+    sortOrder: integer("sort_order").notNull(),
+    ...timestamps,
+  },
+  (t) => [index("tech_questions_group_idx").on(t.groupId)],
+);
+
+export type TechGroup = typeof techGroups.$inferSelect;
+export type TechQuestion = typeof techQuestions.$inferSelect;
+
 export type User = typeof users.$inferSelect;
 export type BankEntry = typeof bankEntries.$inferSelect;
 export type Analysis = typeof analyses.$inferSelect;

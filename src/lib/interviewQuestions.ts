@@ -98,6 +98,13 @@ export const DEFAULT_QUESTIONS: DefaultQuestion[] = [
     star: true,
     hint: "How you got clarity, kept moving, and adapted when things changed.",
   },
+  {
+    key: "tradeoff",
+    group: "behavioral",
+    text: "Tell me about a time you had to make a tradeoff. How did you decide?",
+    star: true,
+    hint: "The options you weighed (e.g. speed vs. quality, cost vs. performance), what you chose and why, and how it turned out.",
+  },
 
   // Strengths & growth
   {
